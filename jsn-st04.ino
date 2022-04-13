@@ -11,7 +11,10 @@ HCSR04 hc(TRIG_PIN, ECHO_PIN);
 
 void setup() {
   pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT_PULLUP);
+  // some people say it goes better with a pullup
+  // I haven't needed it
+  // pinMode(ECHO_PIN, INPUT_PULLUP);
+  pinMode(ECHO_PIN, INPUT);
   digitalWrite(TRIG_PIN, LOW);
   Serial.begin(115200);
 }
@@ -42,16 +45,21 @@ int get_most_common(int vet[], size_t dim)
 
 
 void readSensor(){
+  // to -try- to get rid of the wrong readings
+  // (the sensor is not very stable), we read a few
+  // times and keep the value that was most repeated
   int valuesToRead = 5;
 
   int values[valuesToRead];
   for (int i=0; i<valuesToRead; i++){
    values[i] = hc.dist();
+   // it seems a good idea to give the little thing
+   // some time to settle
    delay(50);
   }
 
   // that +3 is to correct the (looks like) constant error
-  // that this specific module is producing
+  // that my specific module is producing
   int distance = get_most_common(values, valuesToRead) + 3;
 
   Serial.println(distance);    

@@ -7,21 +7,7 @@
 #define ECHO_PIN 5
 
 void readSensor();
-
-char buffer[100];
 HCSR04 hc(TRIG_PIN, ECHO_PIN);
-
-struct
-{
-    boolean enabled;
-    unsigned long timer;
-    unsigned long lastRun;
-    void (*function)();
-    char* functionName;
-} TIMERS[] = {
-  { true, 1*200, 0, &readSensor, "readSensor" },  
-};
-
 
 void setup() {
   pinMode(TRIG_PIN, OUTPUT);
@@ -31,6 +17,7 @@ void setup() {
 }
 
 
+// Thanks for this, StackOverflow
 int get_most_common(int vet[], size_t dim)
 {
     size_t i, j, count;
@@ -63,32 +50,14 @@ void readSensor(){
    delay(50);
   }
 
+  // that +3 is to correct the (looks like) constant error
+  // that this specific module is producing
   int distance = get_most_common(values, valuesToRead) + 3;
-      
-  sprintf(buffer, "the distance is %d", distance);
-  log(buffer);
-}
 
-
-void attendTimers(){    
-  byte NUM_TIMERS = (sizeof(TIMERS) / sizeof(TIMERS[0]));
-  for (int i=0; i<NUM_TIMERS; i++){
-    if (TIMERS[i].enabled && millis() - TIMERS[i].lastRun >= TIMERS[i].timer) {
-      TIMERS[i].function();
-      TIMERS[i].lastRun = millis();
-    }
-  }
-}
-
-
-void log(char* msg){
-  char *ID = "ard";
-  char buffer[100];
-  sprintf(buffer, "[%s] %s", ID, msg);
-  Serial.println(buffer);
+  Serial.println(distance);    
 }
 
 
 void loop() {  
-  attendTimers();
+  readSensor();
 }

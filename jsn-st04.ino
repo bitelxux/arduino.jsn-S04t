@@ -68,4 +68,5 @@ void readSensor(){
 
 void loop() {  
   readSensor();
+  delay(50);
 }
